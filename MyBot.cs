@@ -13,14 +13,7 @@ namespace BattleshipBot
 
 
         var carrierPosition = ShipPositionMaker.GenerateShipPositions()[0];
-      return new List<IShipPosition>
-      {
-         carrierPosition,// Aircraft Carrier
-        GetShipPosition('C', 1, 'C', 4), // Battleship
-        GetShipPosition('E', 1, 'E', 3), // Destroyer
-        GetShipPosition('G', 1, 'G', 3), // Submarine
-        GetShipPosition('I', 1, 'I', 2)  // Patrol boat
-      };
+        return ShipPositionMaker.GenerateShipPositions();
     }
 
     private static ShipPosition GetShipPosition(char startRow, int startColumn, char endRow, int endColumn)

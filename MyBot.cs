@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using Battleships.Player.Interface;
+﻿using Battleships.Player.Interface;
+using System.Collections.Generic;
 
 namespace BattleshipBot
 {
-  public class MyBot : IBattleshipsBot
+    public class MyBot : IBattleshipsBot
   {
     private IGridSquare lastTarget;
 
@@ -11,9 +11,11 @@ namespace BattleshipBot
     {
       lastTarget = null; // Forget all our history when we start a new game
 
+
+        var carrierPosition = ShipPositionMaker.GenerateShipPositions()[0];
       return new List<IShipPosition>
       {
-        GetShipPosition('A', 1, 'A', 5), // Aircraft Carrier
+         carrierPosition,// Aircraft Carrier
         GetShipPosition('C', 1, 'C', 4), // Battleship
         GetShipPosition('E', 1, 'E', 3), // Destroyer
         GetShipPosition('G', 1, 'G', 3), // Submarine
@@ -66,6 +68,6 @@ namespace BattleshipBot
       // Ignore what our opponent does
     }
 
-    public string Name => "Simple Example Bot";
+    public string Name => "Could be better bot";
   }
 }

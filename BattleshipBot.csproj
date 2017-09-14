@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShipPositionMaker.cs" />
     <Compile Include="MyBot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

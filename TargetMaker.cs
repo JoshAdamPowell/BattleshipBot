@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Battleships.Player.Interface;
 
 
@@ -77,7 +78,9 @@ namespace BattleshipBot
                 {
                     return Squares.GetSquareDirection(lastSuccessfulSquare, "left");
                 }
+                return RandomTarget(listTargetsSoFar);
             }
+            MyBot.lastdirection = null;
             var direction = ShipPositionMaker.GetShipOrientation(targetShip);
             if (direction == "horizontal")
             {

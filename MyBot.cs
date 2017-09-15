@@ -9,8 +9,8 @@ namespace BattleshipBot
         private IGridSquare lastTarget;
         public static bool attackMode;
         public IGridSquare lastSuccessfulSquare;
-        public List<IGridSquare> targetShip = new List<IGridSquare>();
-        public static Random random = new Random();
+        public List<IGridSquare> targetShip; 
+        public static Random random;
         public static string lastdirection;
         private static List<IGridSquare> allTargetsSoFar = new List<IGridSquare>();
         public static IGridSquare lastAttackTarget;
@@ -23,7 +23,13 @@ namespace BattleshipBot
         {
             lastTarget = null; // Forget all our history when we start a new game
             attackMode = false; // will go to true once scores hit until boat is destroyed.
-            
+            //From below are new additions here.
+            random = new Random();
+            lastdirection = null;
+            allTargetsSoFar.Clear();
+            lastAttackTarget = null;
+            lastSuccessfulSquare = null;
+            targetShip = new List<IGridSquare>();
             return ShipPositionMaker.GenerateShipPositions();
         }
 
@@ -87,6 +93,6 @@ namespace BattleshipBot
             // Ignore what our opponent does
         }
 
-        public string Name => "Chaser Bot";
+        public string Name => "I say Botato and you say Bot-ah-to";
     }
 }

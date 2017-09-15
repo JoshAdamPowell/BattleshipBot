@@ -9,19 +9,20 @@ namespace BattleshipBot
     class TargetMaker
     {
 
-        public static IGridSquare GetNextTarget(IGridSquare lastTarget)
+        public static IGridSquare GetNextTarget(IGridSquare lastTarget,  List<IGridSquare> alltargetssofar)
         {
+
             if (lastTarget == null)
             {
                 return new GridSquare('A', 1);
             }
             var possibleTarget = new GridSquare(Squares.IncrementRowBy(lastTarget.Row, 1), lastTarget.Column + 1);
-            if (Squares.IsValidSquare(possibleTarget))
+            if (IsThisNewShot(possibleTarget,alltargetssofar))
             {
                 return possibleTarget;
             }
 
-            var diagonalList = new List<GridSquare>()
+            var possibleList = new List<GridSquare>()
             {
                 new GridSquare('A', 3),
                 new GridSquare('A', 5),
@@ -30,13 +31,17 @@ namespace BattleshipBot
                 new GridSquare('C', 1),
                 new GridSquare('E', 1),
                 new GridSquare('G', 1),
-                new GridSquare('I', 1)
+                new GridSquare('I', 1),
             };
-            var diagonalEnumerator = diagonalList.GetEnumerator();
-            diagonalEnumerator.MoveNext();
-            var current = diagonalEnumerator.Current;
-            diagonalEnumerator.Dispose();
-            return current;
+            foreach(var shot in possibleList)
+            {
+                if (IsThisNewShot(shot, alltargetssofar))
+                {
+                    return shot;
+                }
+            }
+            return RandomTarget(alltargetssofar);
+
         }
 
         public static IGridSquare AttackTargetShip(IGridSquare lastSquare, IGridSquare lastSuccessfulSquare, List<IGridSquare> targetShip, List<IGridSquare> listTargetsSoFar)
@@ -47,30 +52,30 @@ namespace BattleshipBot
                 if (MyBot.lastdirection == null && IsThisNewShot(Squares.GetSquareDirection(lastSquare, "above"),listTargetsSoFar))
                 {
                     MyBot.lastdirection = "above";
-                    if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "above"), listTargetsSoFar))
+                    if (IsThisNewShot(Squares.GetSquareDirection(lastSuccessfulSquare, "above"), listTargetsSoFar))
                     {
-                        return Squares.GetSquareDirection(lastSquare, "above");
+                        return Squares.GetSquareDirection(lastSuccessfulSquare, "above");
                     }
                 }
                 if (MyBot.lastdirection == "above")
                 {
                     MyBot.lastdirection = "right";
-                    if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "right"), listTargetsSoFar))
+                    if (IsThisNewShot(Squares.GetSquareDirection(lastSuccessfulSquare, "right"), listTargetsSoFar))
                     {
-                        return Squares.GetSquareDirection(lastSquare, "right");
+                        return Squares.GetSquareDirection(lastSuccessfulSquare, "right");
                     }
                 }
                 if (MyBot.lastdirection == "right")
                 {
                     MyBot.lastdirection = "below";
-                    if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "below"), listTargetsSoFar))
+                    if (IsThisNewShot(Squares.GetSquareDirection(lastSuccessfulSquare, "below"), listTargetsSoFar))
                     {
-                        return Squares.GetSquareDirection(lastSquare, "below");
+                        return Squares.GetSquareDirection(lastSuccessfulSquare, "below");
                     }
                 }
-                if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "left"), listTargetsSoFar))
+                if (IsThisNewShot(Squares.GetSquareDirection(lastSuccessfulSquare, "left"), listTargetsSoFar))
                 {
-                    return Squares.GetSquareDirection(lastSquare, "left");
+                    return Squares.GetSquareDirection(lastSuccessfulSquare, "left");
                 }
             }
             var direction = ShipPositionMaker.GetShipOrientation(targetShip);
@@ -87,7 +92,7 @@ namespace BattleshipBot
                     return (Squares.GetSquareDirection(rightSquare, "right"));
                 }
                 MyBot.attackMode = false;
-                return RandomTarget(listTargetsSoFar);
+                return null;
             }
             if (direction == "vertical")
             {
@@ -102,9 +107,9 @@ namespace BattleshipBot
                     return (Squares.GetSquareDirection(bottomSquare, "below"));
                 }
                 MyBot.attackMode = false;
-                return RandomTarget(listTargetsSoFar);
+                return null;
             }
-            return RandomTarget(listTargetsSoFar);
+            return null;
         }
 
 

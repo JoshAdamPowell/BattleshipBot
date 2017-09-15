@@ -15,6 +15,10 @@ namespace BattleshipBot
         private static List<IGridSquare> allTargetsSoFar = new List<IGridSquare>();
         public static IGridSquare lastAttackTarget;
 
+
+
+
+
         public IEnumerable<IShipPosition> GetShipPositions()
         {
             lastTarget = null; // Forget all our history when we start a new game
@@ -33,13 +37,21 @@ namespace BattleshipBot
             if (!attackMode)
             {
                 targetShip.Clear();
-                currentTarget = TargetMaker.RandomTarget(allTargetsSoFar);
+                currentTarget = TargetMaker.GetNextTarget(lastTarget,  allTargetsSoFar);
                 allTargetsSoFar.Add(currentTarget);
                 lastTarget = currentTarget;
             }
             else
             {
                 currentTarget = TargetMaker.AttackTargetShip(lastAttackTarget, lastSuccessfulSquare, targetShip, allTargetsSoFar);
+                if (currentTarget == null)
+                {
+                    targetShip.Clear();
+                    currentTarget = TargetMaker.GetNextTarget(lastTarget, allTargetsSoFar);
+                    allTargetsSoFar.Add(currentTarget);
+                    lastTarget = currentTarget;
+                    return currentTarget;
+                }
                 allTargetsSoFar.Add(currentTarget);
                 lastAttackTarget = currentTarget;
             }

@@ -78,7 +78,7 @@ namespace BattleshipBot
 
 
 
-
+        /*
         [Test]
         public void NewDiagonalIsChosen()
         {
@@ -86,7 +86,7 @@ namespace BattleshipBot
             var newSquare = TargetMaker.GetNextTarget(testsquare);
             Assert.AreEqual(new GridSquare('A', 3),newSquare );
         }
-
+        */
 
         [Test]
         public void CanFindLowesTColumnOfShip()

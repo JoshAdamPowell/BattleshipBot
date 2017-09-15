@@ -39,74 +39,90 @@ namespace BattleshipBot
             return current;
         }
 
-        public static IGridSquare AttackTargetShip(IGridSquare lastSquare, IGridSquare lastSuccessfulSquare, List<IGridSquare> targetShip)
+        public static IGridSquare AttackTargetShip(IGridSquare lastSquare, IGridSquare lastSuccessfulSquare, List<IGridSquare> targetShip, List<IGridSquare> listTargetsSoFar)
         {
             if (targetShip.Count == 1)
             {
 
-                if (MyBot.lastdirection == null)
+                if (MyBot.lastdirection == null && IsThisNewShot(Squares.GetSquareDirection(lastSquare, "above"),listTargetsSoFar))
                 {
                     MyBot.lastdirection = "above";
-                    return Squares.GetSquareDirection(lastSquare, "above");
+                    if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "above"), listTargetsSoFar))
+                    {
+                        return Squares.GetSquareDirection(lastSquare, "above");
+                    }
                 }
                 if (MyBot.lastdirection == "above")
                 {
                     MyBot.lastdirection = "right";
-                    return Squares.GetSquareDirection(lastSquare, "right");
+                    if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "right"), listTargetsSoFar))
+                    {
+                        return Squares.GetSquareDirection(lastSquare, "right");
+                    }
                 }
                 if (MyBot.lastdirection == "right")
                 {
                     MyBot.lastdirection = "below";
-                    return Squares.GetSquareDirection(lastSquare, "below");
+                    if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "below"), listTargetsSoFar))
+                    {
+                        return Squares.GetSquareDirection(lastSquare, "below");
+                    }
                 }
-                return Squares.GetSquareDirection(lastSquare, "left");
+                if (IsThisNewShot(Squares.GetSquareDirection(lastSquare, "left"), listTargetsSoFar))
+                {
+                    return Squares.GetSquareDirection(lastSquare, "left");
+                }
             }
             var direction = ShipPositionMaker.GetShipOrientation(targetShip);
             if (direction == "horizontal")
             {
                 var leftSquare = ShipPositionMaker.GetLowestColumn(targetShip);
                 var rightSquare = ShipPositionMaker.GetHighestColumn(targetShip);
-                if (IsThisNewShot(Squares.GetSquareDirection(leftSquare,"left")))
+                if (IsThisNewShot(Squares.GetSquareDirection(leftSquare,"left"), listTargetsSoFar))
                 {
                     return (Squares.GetSquareDirection(leftSquare, "left"));
                 }
-                if (IsThisNewShot(Squares.GetSquareDirection(rightSquare, "right")))
+                if (IsThisNewShot(Squares.GetSquareDirection(rightSquare, "right"), listTargetsSoFar))
                 {
                     return (Squares.GetSquareDirection(rightSquare, "right"));
                 }
                 MyBot.attackMode = false;
-                return RandomTarget();
+                return RandomTarget(listTargetsSoFar);
             }
             if (direction == "vertical")
             {
-                var topSquare = ShipPositionMaker.GetLowestRow(targetShip);
-                var bottomSquare = ShipPositionMaker.GetHighestRow(targetShip);
-                if (IsThisNewShot(Squares.GetSquareDirection(topSquare, "above")))
+                var topSquare = ShipPositionMaker.GetHighestRow(targetShip);
+                var bottomSquare = ShipPositionMaker.GetLowestRow(targetShip);
+                if (IsThisNewShot(Squares.GetSquareDirection(topSquare, "above"), listTargetsSoFar))
                 {
                     return (Squares.GetSquareDirection(topSquare, "above"));
                 }
-                if (IsThisNewShot(Squares.GetSquareDirection(bottomSquare, "below")))
+                if (IsThisNewShot(Squares.GetSquareDirection(bottomSquare, "below"), listTargetsSoFar))
                 {
                     return (Squares.GetSquareDirection(bottomSquare, "below"));
                 }
                 MyBot.attackMode = false;
-                return RandomTarget();
+                return RandomTarget(listTargetsSoFar);
             }
-            return RandomTarget();
+            return RandomTarget(listTargetsSoFar);
         }
 
 
 
 
-        public static bool IsThisNewShot(IGridSquare newShot)
+        public static bool IsThisNewShot(IGridSquare newShot, List<IGridSquare> allTargetsSoFar)
         {
-            return !MyBot.allTargetsSoFar.Contains(newShot);
+            if (!allTargetsSoFar.Contains(newShot) && Squares.IsValidSquare(newShot))
+            {
+                return true;
+            }
+            return false;
         }
 
 
 
 
-        public static IGridSquare RandomTarget()
+        public static IGridSquare RandomTarget(List<IGridSquare> listTargetsSoFar)
         {
             
             while (true)
@@ -114,7 +130,7 @@ namespace BattleshipBot
                 var shipRow = MyBot.random.Next(1, 11);
                 var shipCol = MyBot.random.Next(1, 11);
                 var potentialSquare = new GridSquare(Squares.ConvertIntToLetter(shipRow), shipCol);
-                if (IsThisNewShot(potentialSquare))
+                if (IsThisNewShot(potentialSquare, listTargetsSoFar))
                 {
                     return new GridSquare(Squares.ConvertIntToLetter(shipRow), shipCol);
                 }

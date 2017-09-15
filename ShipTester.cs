@@ -75,6 +75,10 @@ namespace BattleshipBot
         }
 
 
+
+
+
+
         [Test]
         public void NewDiagonalIsChosen()
         {
@@ -97,6 +101,19 @@ namespace BattleshipBot
         }
 
         [Test]
+        public void CanFindHighestColumnOfShip()
+        {
+            var ship = new List<IGridSquare>()
+            {
+                new GridSquare('A', 6),
+                new GridSquare('A', 5)
+            };
+            var lowest = ShipPositionMaker.GetLowestColumn(ship);
+            Assert.AreEqual(new GridSquare('A', 5), lowest);
+        }
+
+
+        [Test]
         public void CanFindLowestRowOfShip()
         {
             var ship = new List<IGridSquare>()
@@ -109,6 +126,29 @@ namespace BattleshipBot
 
         }
 
+        [Test]
+        public void CanFindHigestRowOfShip()
+        {
+            var ship = new List<IGridSquare>()
+            {
+                new GridSquare('C', 6),
+                new GridSquare('D', 6)
+            };
+            var lowest = ShipPositionMaker.GetHighestRow(ship);
+            Assert.AreEqual(new GridSquare('D', 6), lowest);
+
+        }
+        /*
+        [Test]
+        public void WillFindVerticalShip()
+        {
+            var ship = new ShipPosition(new GridSquare('A', 1), new GridSquare('D', 1));
+
+
+
+            AttackTargetShip(new GridSquare('B',2), new GridSquare('B', 2), List < IGridSquare > targetShip, List < IGridSquare > listTargetsSoFar)
+        }
+        */
 
     }
 }

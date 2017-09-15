@@ -151,8 +151,12 @@ namespace BattleshipBot
 
         public static IGridSquare GetHighestRow(List<IGridSquare> ship)
         {
-
-            var etst = ship.Max(x => Squares.ConvertLetterToINt(x.Row));
+            List<int> highestList = new List<int>();
+            foreach (var grid in ship)
+            {
+                highestList.Add(Squares.ConvertLetterToINt(grid.Row));
+            }
+            int etst = highestList.Max();
 
             return new GridSquare(Squares.ConvertIntToLetter(etst), ship[0].Column);
         }

@@ -9,10 +9,11 @@ namespace BattleshipBot
         private IGridSquare lastTarget;
         public static bool attackMode;
         public IGridSquare lastSuccessfulSquare;
-        public List<IGridSquare> targetShip;
+        public List<IGridSquare> targetShip = new List<IGridSquare>();
         public static Random random = new Random();
         public static string lastdirection;
-        public static List<IGridSquare> allTargetsSoFar;
+        private static List<IGridSquare> allTargetsSoFar = new List<IGridSquare>();
+        public static IGridSquare lastAttackTarget;
 
         public IEnumerable<IShipPosition> GetShipPositions()
         {
@@ -27,17 +28,23 @@ namespace BattleshipBot
 
         public IGridSquare SelectTarget()
         {
-            return TargetMaker.RandomTarget();
 
-            //var currentTarget = whatever
-            //allTargetsSoFar.Add(currentTarget);
-            //lastTarget = currentTarget
-            //return currentTarget
-            /*
-                var nextTarget = TargetMaker.GetNextTarget(lastTarget);
-                lastTarget = nextTarget;
-                return nextTarget;
-            */
+            IGridSquare currentTarget;
+            if (!attackMode)
+            {
+                targetShip.Clear();
+                currentTarget = TargetMaker.RandomTarget(allTargetsSoFar);
+                allTargetsSoFar.Add(currentTarget);
+                lastTarget = currentTarget;
+            }
+            else
+            {
+                currentTarget = TargetMaker.AttackTargetShip(lastAttackTarget, lastSuccessfulSquare, targetShip, allTargetsSoFar);
+                allTargetsSoFar.Add(currentTarget);
+                lastAttackTarget = currentTarget;
+            }
+            return currentTarget;
+
 
         }
 
@@ -51,11 +58,13 @@ namespace BattleshipBot
                 lastSuccessfulSquare = square;
                 targetShip.Add(lastSuccessfulSquare);
                 lastdirection = null;
+                lastAttackTarget = square;
             }
             else if (wasHit && attackMode)
             {
                 lastSuccessfulSquare = square;
                 targetShip.Add(lastSuccessfulSquare);
+                lastAttackTarget = square;
             }
             
             // Ignore whether we're successful
@@ -66,6 +75,6 @@ namespace BattleshipBot
             // Ignore what our opponent does
         }
 
-        public string Name => "Chaos Bot";
+        public string Name => "Chaser Bot";
     }
 }

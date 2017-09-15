@@ -33,7 +33,7 @@ namespace BattleshipBot
         {
             var square1 = new GridSquare('C', 1);
             var square2 = new GridSquare('D', 1);
-            var test = ShipPositionMaker.AreSquaresAdjacent(square1, square2);
+            var test = Squares.AreSquaresAdjacent(square1, square2);
             Assert.AreEqual(true,test);
         }
 
@@ -42,7 +42,7 @@ namespace BattleshipBot
         {
             var square1 = new GridSquare('A', 1);
             var square2 = new GridSquare('E', 2);
-            var test = ShipPositionMaker.AreSquaresAdjacent(square1, square2);
+            var test = Squares.AreSquaresAdjacent(square1, square2);
             Assert.AreEqual(false, test);
         }
 
@@ -65,6 +65,48 @@ namespace BattleshipBot
             var ship2 = new ShipPosition(new GridSquare('F', 3), new GridSquare('F', 7));
             var test = ShipPositionMaker.IsNotAdjacentToCurrentShip(ship2, testShipList);
             Assert.AreEqual(true, test);
+        }
+
+        [Test]
+        public void ShipsGenerated()
+        {
+            var test = ShipPositionMaker.GenerateShipPositions();
+            Console.WriteLine();
+        }
+
+
+        [Test]
+        public void NewDiagonalIsChosen()
+        {
+            var testsquare = new GridSquare('J', 10);
+            var newSquare = TargetMaker.GetNextTarget(testsquare);
+            Assert.AreEqual(new GridSquare('A', 3),newSquare );
+        }
+
+
+        [Test]
+        public void CanFindLowesTColumnOfShip()
+        {
+            var ship = new List<IGridSquare>()
+            {
+                new GridSquare('A', 6),
+                new GridSquare('A', 5)
+            };
+            var lowest = ShipPositionMaker.GetLowestColumn(ship);
+            Assert.AreEqual(new GridSquare('A', 5),lowest );
+        }
+
+        [Test]
+        public void CanFindLowestRowOfShip()
+        {
+            var ship = new List<IGridSquare>()
+            {
+                new GridSquare('C', 6),
+                new GridSquare('D', 6)
+            };
+            var lowest = ShipPositionMaker.GetLowestRow(ship);
+            Assert.AreEqual(new GridSquare('C', 6), lowest);
+
         }
 
 

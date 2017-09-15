@@ -1,66 +1,71 @@
-﻿using Battleships.Player.Interface;
+﻿using System;
+using Battleships.Player.Interface;
 using System.Collections.Generic;
 
 namespace BattleshipBot
 {
     public class MyBot : IBattleshipsBot
-  {
-    private IGridSquare lastTarget;
-
-    public IEnumerable<IShipPosition> GetShipPositions()
     {
-      lastTarget = null; // Forget all our history when we start a new game
+        private IGridSquare lastTarget;
+        public static bool attackMode;
+        public IGridSquare lastSuccessfulSquare;
+        public List<IGridSquare> targetShip;
+        public static Random random = new Random();
+        public static string lastdirection;
+        public static List<IGridSquare> allTargetsSoFar;
+
+        public IEnumerable<IShipPosition> GetShipPositions()
+        {
+            lastTarget = null; // Forget all our history when we start a new game
+            attackMode = false; // will go to true once scores hit until boat is destroyed.
+            
+            return ShipPositionMaker.GenerateShipPositions();
+        }
 
 
-        var carrierPosition = ShipPositionMaker.GenerateShipPositions()[0];
-        return ShipPositionMaker.GenerateShipPositions();
+
+
+        public IGridSquare SelectTarget()
+        {
+            return TargetMaker.RandomTarget();
+
+            //var currentTarget = whatever
+            //allTargetsSoFar.Add(currentTarget);
+            //lastTarget = currentTarget
+            //return currentTarget
+            /*
+                var nextTarget = TargetMaker.GetNextTarget(lastTarget);
+                lastTarget = nextTarget;
+                return nextTarget;
+            */
+
+        }
+
+
+        public void HandleShotResult(IGridSquare square, bool wasHit)
+        {
+            if (wasHit && !attackMode)
+            {
+
+                attackMode = true;
+                lastSuccessfulSquare = square;
+                targetShip.Add(lastSuccessfulSquare);
+                lastdirection = null;
+            }
+            else if (wasHit && attackMode)
+            {
+                lastSuccessfulSquare = square;
+                targetShip.Add(lastSuccessfulSquare);
+            }
+            
+            // Ignore whether we're successful
+        }
+
+        public void HandleOpponentsShot(IGridSquare square)
+        {
+            // Ignore what our opponent does
+        }
+
+        public string Name => "Chaos Bot";
     }
-
-    private static ShipPosition GetShipPosition(char startRow, int startColumn, char endRow, int endColumn)
-    {
-      return new ShipPosition(new GridSquare(startRow, startColumn), new GridSquare(endRow, endColumn));
-    }
-
-    public IGridSquare SelectTarget()
-    {
-      var nextTarget = GetNextTarget();
-      lastTarget = nextTarget;
-      return nextTarget;
-    }
-
-    private IGridSquare GetNextTarget()
-    {
-      if (lastTarget == null)
-      {
-        return new GridSquare('A', 1);
-      }
-
-      var row = lastTarget.Row;
-      var col = lastTarget.Column + 1;
-      if (lastTarget.Column != 10)
-      {
-        return new GridSquare(row, col);
-      }
-
-      row = (char)(row + 1);
-      if (row > 'J')
-      {
-        row = 'A';
-      }
-      col = 1;
-      return new GridSquare(row, col);
-    }
-
-    public void HandleShotResult(IGridSquare square, bool wasHit)
-    {
-      // Ignore whether we're successful
-    }
-
-    public void HandleOpponentsShot(IGridSquare square)
-    {
-      // Ignore what our opponent does
-    }
-
-    public string Name => "Could be better bot";
-  }
 }

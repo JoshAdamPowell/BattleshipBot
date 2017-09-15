@@ -7,38 +7,40 @@ namespace BattleshipBot
 {
     class ShipPositionMaker
     {
-        public static List<IShipPosition> GenerateShipPositions()
+        public static IEnumerable<IShipPosition> GenerateShipPositions()
         {
 
             var shipPositions = new List<IShipPosition>();
 
             var random = new Random();
-            var shipPlaced = false;
+            
             var shipsToPlace = new List<int>() {5, 4, 3, 3, 2};
 
             foreach (int length in shipsToPlace)
             {
+                var shipPlaced = false;
                 while (!shipPlaced)
                 {
-                    var shipRow = random.Next(0, 9);
-                    var shipCol = random.Next(0, 9);
+                    var shipRow = random.Next(1, 11);
+                    var shipCol = random.Next(1, 11);
 
 
-                    var direction = random.Next(0, 1);
-                    var carrierPosition = new ShipPosition(null, null);
+                    var direction = random.Next(0, 2);
+                    var shipPosition = new ShipPosition(null, null);
                     if (direction == 0)
                     {
-                        carrierPosition = new ShipPosition(new GridSquare(ConvertIntToLetter(shipRow), shipCol),
-                            new GridSquare(ConvertIntToLetter(shipRow), shipCol + (length - 1)));
+                        shipPosition = new ShipPosition(new GridSquare(Squares.ConvertIntToLetter(shipRow), shipCol),
+                            new GridSquare(Squares.ConvertIntToLetter(shipRow), shipCol + (length - 1)));
                     }
+                    //fix vertical positions
                     else if (direction == 1)
                     {
-                        carrierPosition = new ShipPosition(new GridSquare(ConvertIntToLetter(shipRow), shipCol),
-                            new GridSquare(ConvertIntToLetter(shipRow + (length - 1)), shipCol));
+                        shipPosition = new ShipPosition(new GridSquare(Squares.ConvertIntToLetter(shipRow), shipCol),
+                            new GridSquare(Squares.ConvertIntToLetter(shipRow + (length - 1)), shipCol));
                     }
-                    if (IsValidPosition(carrierPosition, shipPositions))
+                    if (IsValidPosition(shipPosition, shipPositions))
                     {
-                        shipPositions.Add(carrierPosition);
+                        shipPositions.Add(shipPosition);
                         shipPlaced = true;
                     }
 
@@ -52,7 +54,7 @@ namespace BattleshipBot
         {
             var startingSquare = ship.StartingSquare;
             var endingSquare = ship.EndingSquare;
-            if (IsValidSquare(startingSquare) && IsValidSquare(endingSquare) && IsNotAdjacentToCurrentShip(ship, list))
+            if (Squares.IsValidSquare(startingSquare) && Squares.IsValidSquare(endingSquare) && IsNotAdjacentToCurrentShip(ship, list))
             {
                 return true;
             }
@@ -62,25 +64,7 @@ namespace BattleshipBot
         }
 
 
-        public static bool IsValidSquare(IGridSquare square)
-        {
-            var possibleGrids = new List<IGridSquare>();
-            for (int row = 0; row < 10; row++)
-            {
-                for (int col = 0; col < 10; col++)
-                {
-                    possibleGrids.Add(new GridSquare(ConvertIntToLetter(row), col));
-                }
-            }
-            if (possibleGrids.Contains(square))
-            {
-                return true;
-            }
-            {
-                return false;
-            }
-        }
-        
+  
 
         public static bool IsNotAdjacentToCurrentShip(ShipPosition ship, List<IShipPosition> list)
         {
@@ -90,7 +74,7 @@ namespace BattleshipBot
                 occupiedSquares.AddRange(AllShipSquares(boat));
             }
             var testBoatSquares = AllShipSquares(ship);
-            return !(from square in testBoatSquares from occupiedSquare in occupiedSquares where AreSquaresAdjacent(occupiedSquare, square) select square).Any();
+            return !(from square in testBoatSquares from occupiedSquare in occupiedSquares where Squares.AreSquaresAdjacent(occupiedSquare, square) select square).Any();
         }
         
 
@@ -135,80 +119,44 @@ namespace BattleshipBot
 
         }
 
-        public static bool AreSquaresAdjacent(GridSquare square1, GridSquare square2)
+        public static string GetShipOrientation(List<IGridSquare> ship)
         {
-
-            for (int i = -1; i <= 1; i++)
+            if (ship[0].Row == ship[1].Row)
             {
-                for (int j = -1; j <= 1; j++)
-                {
-                    var testsquare = new GridSquare(ConvertIntToLetter(ConvertLetterToINt(square1.Row) + i),
-                        square1.Column + j);
-                    if (testsquare.Equals(square2))
-                    {
-                        return true;
-                    }
-                }
+                return "horizontal";
             }
-            return false;
+            return "vertical";
         }
 
 
-
-
-
-
-
-
-
-        public static char ConvertIntToLetter(int num)
+        public static IGridSquare GetLowestColumn(List<IGridSquare> ship)
         {
-            var letterDictionary = new Dictionary<int, char>()
-            {
-                {-1, ' ' },
-                {0, 'A'},
-                {1, 'B'},
-                {2, 'C'},
-                {3, 'D'},
-                {4, 'E'},
-                {5, 'F'},
-                {6, 'G'},
-                {7, 'H'},
-                {8, 'I'},
-                {9, 'J'},
-                {10, 'K'},
-                {11,'L' },
-                {12, 'M' },
-                {13, 'N' },
-                {14, 'O' }
-            };
-
-            return letterDictionary[num];
+            var etst = ship.Min(x => x.Column);
+            return new GridSquare(ship[0].Row, etst);
         }
-        public static int ConvertLetterToINt(char c)
+
+        public static IGridSquare GetHighestColumn(List<IGridSquare> ship)
         {
-            var letterDictionary = new Dictionary<char, int>()
-            {
-
-                {'A',0},
-                {'B', 1},
-                {'C', 2},
-                {'D', 3},
-                {'E', 4},
-                {'F', 5},
-                {'G', 6},
-                {'H', 7},
-                {'I', 8},
-                {'J', 9},
-                {'K', 10},
-                {'L', 11 },
-                { 'M' , 12},
-                { 'N', 13 },
-                {'O', 14 }
-            };
-
-            return letterDictionary[c];
+            var etst = ship.Max(x => x.Column);
+            return new GridSquare(ship[0].Row, etst);
         }
+
+        public static IGridSquare GetLowestRow(List<IGridSquare> ship)
+        {
+
+            var etst = ship.Min(x => Squares.ConvertLetterToINt(x.Row));
+
+            return new GridSquare(Squares.ConvertIntToLetter(etst), ship[0].Column);
+        }
+
+        public static IGridSquare GetHighestRow(List<IGridSquare> ship)
+        {
+
+            var etst = ship.Max(x => Squares.ConvertLetterToINt(x.Row));
+
+            return new GridSquare(Squares.ConvertIntToLetter(etst), ship[0].Column);
+        }
+
 
 
 
